@@ -7,10 +7,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
       font-family: 'Orbitron', sans-serif;
+      overflow: hidden; /* Prevent scrollbars from canvas */
+    }
+
+    body {
       color: white;
       display: flex;
       flex-direction: column;
@@ -20,18 +25,36 @@
       background: linear-gradient(135deg, #6e00ff, #3a3a3a);
       background-attachment: fixed;
       transition: background 1s ease;
+      position: relative;
+      z-index: 10; /* above canvas */
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1; /* behind content */
+      pointer-events: none; /* clicks pass through */
+      background: transparent;
+      display: block;
     }
 
     h1 {
       font-size: 2.7rem;
       margin-bottom: 10px;
       letter-spacing: 1px;
+      position: relative;
+      z-index: 10;
     }
 
     .subtitle {
       font-size: 1rem;
       color: #ddd;
       margin-bottom: 30px;
+      position: relative;
+      z-index: 10;
     }
 
     .profile-pic {
@@ -41,6 +64,8 @@
       object-fit: cover;
       border: 3px solid #444;
       margin-bottom: 20px;
+      position: relative;
+      z-index: 10;
     }
 
     .link-list {
@@ -49,6 +74,8 @@
       display: flex;
       flex-direction: column;
       gap: 30px;
+      position: relative;
+      z-index: 10;
     }
 
     .section {
@@ -92,9 +119,10 @@
       margin-top: 50px;
       font-size: 0.75rem;
       opacity: 0.6;
+      position: relative;
+      z-index: 10;
     }
 
-    /* Button to toggle background */
     #toggle-bg-btn {
       margin: 20px 0 40px;
       padding: 10px 25px;
@@ -105,6 +133,8 @@
       color: white;
       cursor: pointer;
       transition: background 0.3s ease;
+      position: relative;
+      z-index: 10;
     }
 
     #toggle-bg-btn:hover {
@@ -113,6 +143,8 @@
   </style>
 </head>
 <body>
+  <canvas id="bg-canvas"></canvas>
+
   <img src="profile.jpg" alt="Baby Vaun" class="profile-pic">
   <h1>Baby Vaun</h1>
   <div class="subtitle">Official Links & Music Releases</div>
@@ -120,7 +152,6 @@
   <button id="toggle-bg-btn">Change Background</button>
 
   <div class="link-list">
-    <!-- 🔥 Latest Releases -->
     <div class="section">
       <h2>🔥 Latest Releases</h2>
       <a href="https://soundcloud.com/babyvaun/sets/my-way-out" target="_blank"><i class="fab fa-soundcloud"></i> My Way Out (Album)</a>
@@ -128,7 +159,6 @@
       <a href="https://soundcloud.com/babyvaun/no-oppss" target="_blank"><i class="fab fa-soundcloud"></i> No Opps / All My Opps Are Dead</a>
     </div>
 
-    <!-- 🎶 Music Platforms -->
     <div class="section">
       <h2>🎶 Music Platforms</h2>
       <a href="https://open.spotify.com/artist/70sNUPNh3eYQnlV53V5B0U" target="_blank"><i class="fab fa-spotify"></i> Spotify – Artist Profile</a>
@@ -137,7 +167,6 @@
       <a href="https://soundcloud.com/babyvaun" target="_blank"><i class="fab fa-soundcloud"></i> SoundCloud – Baby Vaun</a>
     </div>
 
-    <!-- 📱 Social Media -->
     <div class="section">
       <h2>📱 Social Media</h2>
       <a href="https://instagram.com/babyvaunofficial" target="_blank"><i class="fab fa-instagram"></i> Instagram – @babyvaunofficial</a>
@@ -154,6 +183,7 @@
   </div>
 
   <script>
+    // Background gradients toggle
     const gradients = [
       'linear-gradient(135deg, #6e00ff, #3a3a3a)',        // Purple/Grey
       'linear-gradient(135deg, #ff0000, #660000)',        // Red
@@ -172,6 +202,111 @@
       current = (current + 1) % gradients.length;
       body.style.background = gradients[current];
     });
-  </script>
-</body>
-</html>
+
+    // Particle background canvas effect with connecting lines
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    // Adjust canvas size to window size
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Particle class
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.3; // slow velocity
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.radius = 2;
+      }
+
+      move() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Create particles
+    const particleCount = 100;
+    const particles = [];
+    for(let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    let mouse = { x: null, y: null };
+
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseout', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    function distance(a, b) {
+      return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2);
+    }
+
+    function findClosestThreeParticles(mouse, particles) {
+      if (mouse.x === null || mouse.y === null) return [];
+
+      // Calculate distance to mouse for each particle
+      const distances = particles.map(p => ({
+        particle: p,
+        dist: distance(mouse, p)
+      }));
+
+      distances.sort((a, b) => a.dist - b.dist);
+
+      return distances.slice(0, 3).map(d => d.particle);
+    }
+
+    function connectDots(dots) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      // Connect all pairs among these three dots
+      for(let i = 0; i < dots.length; i++) {
+        for(let j = i + 1; j < dots.length; j++) {
+          ctx.moveTo(dots[i].x, dots[i].y);
+          ctx.lineTo(dots[j].x, dots[j].y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Move & draw all particles
+      for (let p of particles) {
+        p.move();
+        p.draw();
+      }
+
+      // Draw connecting lines for closest 3 to mouse
+      const closest = findClosestThreeParticles(mouse, particles);
+      if(closest.length === 3) {
+        connectDots(closest);
+      }
+
