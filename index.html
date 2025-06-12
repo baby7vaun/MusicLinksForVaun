@@ -11,14 +11,15 @@
       margin: 0;
       padding: 0;
       font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(135deg, #6e00ff, #3a3a3a);
       color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       padding: 40px 20px;
+      background: linear-gradient(135deg, #6e00ff, #3a3a3a);
       background-attachment: fixed;
+      transition: background 1s ease;
     }
 
     h1 {
@@ -92,12 +93,31 @@
       font-size: 0.75rem;
       opacity: 0.6;
     }
+
+    /* Button to toggle background */
+    #toggle-bg-btn {
+      margin: 20px 0 40px;
+      padding: 10px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 25px;
+      background: rgba(255 255 255 / 0.2);
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    #toggle-bg-btn:hover {
+      background: rgba(255 255 255 / 0.4);
+    }
   </style>
 </head>
 <body>
   <img src="profile.jpg" alt="Baby Vaun" class="profile-pic">
   <h1>Baby Vaun</h1>
   <div class="subtitle">Official Links & Music Releases</div>
+
+  <button id="toggle-bg-btn">Change Background</button>
 
   <div class="link-list">
     <!-- 🔥 Latest Releases -->
@@ -132,5 +152,26 @@
   <div class="footer">
     © 2025 Baby Vaun. All rights reserved.
   </div>
+
+  <script>
+    const gradients = [
+      'linear-gradient(135deg, #6e00ff, #3a3a3a)',        // Purple/Grey
+      'linear-gradient(135deg, #ff0000, #660000)',        // Red
+      'linear-gradient(135deg, #0066ff, #003366)',        // Blue
+      'linear-gradient(135deg, #00cc44, #004d26)',        // Green
+      'linear-gradient(135deg, #ff9900, #663300)',        // Orange
+      'linear-gradient(135deg, #ff66cc, #660033)',        // Pink
+      'linear-gradient(135deg, #00cccc, #004d4d)'         // Teal
+    ];
+
+    let current = 0;
+    const body = document.body;
+    const btn = document.getElementById('toggle-bg-btn');
+
+    btn.addEventListener('click', () => {
+      current = (current + 1) % gradients.length;
+      body.style.background = gradients[current];
+    });
+  </script>
 </body>
 </html>
