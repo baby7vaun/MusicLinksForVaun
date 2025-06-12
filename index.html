@@ -12,7 +12,7 @@
       padding: 0;
       height: 100%;
       font-family: 'Orbitron', sans-serif;
-      overflow: hidden; /* Prevent scrollbars from canvas */
+      overflow: hidden;
     }
 
     body {
@@ -26,7 +26,7 @@
       background-attachment: fixed;
       transition: background 1s ease;
       position: relative;
-      z-index: 10; /* above canvas */
+      z-index: 10;
     }
 
     #bg-canvas {
@@ -35,8 +35,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 1; /* behind content */
-      pointer-events: none; /* clicks pass through */
+      z-index: 1;
+      pointer-events: none;
       background: transparent;
       display: block;
     }
@@ -208,7 +208,6 @@
     const ctx = canvas.getContext('2d');
     let width, height;
 
-    // Adjust canvas size to window size
     function resize() {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -218,12 +217,11 @@
     window.addEventListener('resize', resize);
     resize();
 
-    // Particle class
     class Particle {
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.3; // slow velocity
+        this.vx = (Math.random() - 0.5) * 0.3;
         this.vy = (Math.random() - 0.5) * 0.3;
         this.radius = 2;
       }
@@ -231,20 +229,18 @@
       move() {
         this.x += this.vx;
         this.y += this.vy;
-
         if (this.x < 0 || this.x > width) this.vx *= -1;
         if (this.y < 0 || this.y > height) this.vy *= -1;
       }
 
       draw() {
         ctx.beginPath();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Create particles
     const particleCount = 100;
     const particles = [];
     for(let i = 0; i < particleCount; i++) {
@@ -269,15 +265,11 @@
 
     function findClosestThreeParticles(mouse, particles) {
       if (mouse.x === null || mouse.y === null) return [];
-
-      // Calculate distance to mouse for each particle
       const distances = particles.map(p => ({
         particle: p,
         dist: distance(mouse, p)
       }));
-
       distances.sort((a, b) => a.dist - b.dist);
-
       return distances.slice(0, 3).map(d => d.particle);
     }
 
@@ -285,7 +277,6 @@
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      // Connect all pairs among these three dots
       for(let i = 0; i < dots.length; i++) {
         for(let j = i + 1; j < dots.length; j++) {
           ctx.moveTo(dots[i].x, dots[i].y);
@@ -297,16 +288,17 @@
 
     function animate() {
       ctx.clearRect(0, 0, width, height);
-
-      // Move & draw all particles
       for (let p of particles) {
         p.move();
         p.draw();
       }
-
-      // Draw connecting lines for closest 3 to mouse
       const closest = findClosestThreeParticles(mouse, particles);
       if(closest.length === 3) {
         connectDots(closest);
       }
-
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
