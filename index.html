@@ -12,7 +12,7 @@
       padding: 0;
       height: 100%;
       font-family: 'Orbitron', sans-serif;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     body {
@@ -241,7 +241,7 @@
       }
     }
 
-    const particleCount = 100;
+    const particleCount = 250;
     const particles = [];
     for(let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
@@ -275,7 +275,7 @@
 
     function connectDots(dots) {
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 3.5;
       ctx.beginPath();
       for(let i = 0; i < dots.length; i++) {
         for(let j = i + 1; j < dots.length; j++) {
